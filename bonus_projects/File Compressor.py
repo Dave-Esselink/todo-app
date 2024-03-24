@@ -1,5 +1,6 @@
 import PySimpleGUI as sg
 from zip_creator import make_archive
+import os
 
 label1 = sg.Text("Select files to compress:")
 input1 = sg.Input()                            #filepath box
@@ -27,6 +28,8 @@ while True:
         #Grabs the filepaths, both input and output paths are one string split by a semicolon
         folderpath = values["folder"]
         make_archive(filepaths, folderpath)
+
+        os.startfile(folderpath)
 
 
 window.read()
