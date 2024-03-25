@@ -1,5 +1,6 @@
 import cfun
 import PySimpleGUI as sg                  #imports custom GUI modual. 3rd party library
+from typing import Any
 
 label = sg.Text("Type in a to-do")        #App user prompt
 input_box = sg.InputText(tooltip="Enter todo", key="todo")
@@ -39,17 +40,37 @@ while True:
             window["todo_items"].update(values=todos)
             #Updates the window after the item is added to the list
         case "Edit":
-            todo_edit = values['todo_items'][0]
-            new_todo = values['todo'] + "\n"
-            #todo=input box, todo_items=List window
-            todos = cfun.get_todos()
-            index = todos.index(todo_edit)
-            #Locates the specified item in 'todo_items'
-            todos[index] = new_todo
-            #Updates the item in the todos list
-            cfun.write_todos(todos)
-            window["todo_items"].update(values=todos)
-            #Updates the window after the item is edited
+            popup_layout = [
+                        [sg.Text("Enter new todo:")],
+                        [sg.InputText(key='new_todo')],
+                        [sg.Button('OK'), sg.Button('Cancel')]
+                                                            ]
+            popup_window: sg.Window = sg.Window('Edit Todo', popup_layout) # type: Any
+
+            todo_items = values['todo_items'] if 'todo_items' in values else []
+            if todo_items:                 # Check if todo_items is not empty
+                todo_edit = todo_items[0]  # Extract the first item from the list
+
+                popup_event, popup_values = popup_window.read()
+
+                if popup_event == 'OK':
+
+                    new_todo = popup_values['new_todo'] + "\n"
+                    #todo=input box, todo_items=List window
+                    todos = cfun.get_todos()
+                    index = todos.index(todo_edit)
+                    #Locates the specified item in 'todo_items'
+                    todos[index] = new_todo
+                    #Updates the item in the todos list
+                    cfun.write_todos(todos)
+                    window["todo_items"].update(values=todos)
+                    #Updates the window after the item is edited
+                elif popup_event == 'Cancel':
+                    pass
+            else:
+                sg.popup_error("Please select a todo item to edit.")
+
+
         case "Complete":
             todo_to_complete = values['todo_items'][0]
             todos = cfun.get_todos()
