@@ -8,17 +8,21 @@ add_button = sg.Button("Add")
 list_box = sg.Listbox(values=cfun.get_todos(), key='todo_items', enable_events=True, size=[45, 10])
 #Creates a list box and populates it with todos.txt. key=Used to access the contents of the list
 edit_button = sg.Button("Edit")
+complete_button = sg.Button("Complete")
+exit_button = sg.Button("Exit")
 
 window = sg.Window('To-Do App',
                    layout=[[label],
                            [input_box, add_button],
-                           [list_box, edit_button]],
+                           [list_box, edit_button, complete_button],
+                           [exit_button]],
                    font=('Helvetica', 10))
                    #Each set of brackets=Another horizontal row
 while True:
 #Keeps the window open
     event, values = window.read()
-    #Multiple variables can be used with tuples. window.read outputs a dictonary. Event=Interface button, values=dictonary
+    #Multiple variables can be used with tuples. window.read outputs a dictonary.
+    # #Event=Interface button, values=dictonary
     print(event)
     print(values)
     match event:
@@ -46,6 +50,19 @@ while True:
             cfun.write_todos(todos)
             window["todo_items"].update(values=todos)
             #Updates the window after the item is edited
+        case "Complete":
+            todo_to_complete = values['todo_items'][0]
+            todos = cfun.get_todos()
+            # Gets a list from values, and grabs the todos.txt file
+            todos.remove(todo_to_complete)
+            cfun.write_todos(todos)
+            #Removes the selected item from the todos_items list, writes the updated list to the file
+            window['todo_items'].update(values=todos)
+            window['todo'].update(value='')
+            #Updates the item list window, and removes the item name from the input box
+
+        case "Exit":
+            break
         case "todo_items":
             window['todo'].update(value=values['todo_items'][0])
             #Displays the item in the input box when clicked
@@ -54,3 +71,6 @@ while True:
             break
 
 window.close()
+
+
+

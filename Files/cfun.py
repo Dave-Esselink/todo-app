@@ -16,5 +16,6 @@ def write_todos(todos_arg, filepath=FILEPATH):
 
 
 if __name__ == "__main__":
-    print("Hello")
     print(get_todos())
+#Executes code only if the script is run directly.
+#Will not run if this script is imported into another file

@@ -30,7 +30,7 @@ while True:
         make_archive(filepaths, folderpath)
 
         os.startfile(folderpath)
-
+        #Opens the file explorer when the code executes
 
 window.read()
 window.close()
