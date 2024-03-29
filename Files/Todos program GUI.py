@@ -1,7 +1,12 @@
 import cfun
 import PySimpleGUI as sg                  #imports custom GUI modual. 3rd party library
 from typing import Any
+import time
 
+
+sg.theme("Topanga")
+
+clock = sg.Text('', key='clock')
 label = sg.Text("Type in a to-do")        #App user prompt
 input_box = sg.InputText(tooltip="Enter todo", key="todo")
 #Input text box. key=The dictonary key in window.read(). Key= is used to access the input box's contents in other code
@@ -13,7 +18,8 @@ complete_button = sg.Button("Complete")
 exit_button = sg.Button("Exit")
 
 window = sg.Window('To-Do App',
-                   layout=[[label],
+                   layout=[[clock],
+                            [label],
                            [input_box, add_button],
                            [list_box, edit_button, complete_button],
                            [exit_button]],
@@ -21,11 +27,11 @@ window = sg.Window('To-Do App',
                    #Each set of brackets=Another horizontal row
 while True:
 #Keeps the window open
-    event, values = window.read()
+    event, values = window.read(timeout=600)
+    window["clock"].update(value=time.strftime("%b %d, %Y"))
     #Multiple variables can be used with tuples. window.read outputs a dictonary.
     # #Event=Interface button, values=dictonary
-    print(event)
-    print(values)
+
     match event:
     #Maps the buttons to a function
         case "Add":
@@ -46,7 +52,7 @@ while True:
                         [sg.Button('OK'), sg.Button('Cancel')]
                                                             ]
             popup_window: sg.Window = sg.Window('Edit Todo', popup_layout) # type: Any
-
+            #Added popup window when clicking Edit
             todo_items = values['todo_items'] if 'todo_items' in values else []
             if todo_items:                 # Check if todo_items is not empty
                 todo_edit = todo_items[0]  # Extract the first item from the list
@@ -65,23 +71,27 @@ while True:
                     cfun.write_todos(todos)
                     window["todo_items"].update(values=todos)
                     #Updates the window after the item is edited
+                    popup_window.close()
                 elif popup_event == 'Cancel':
+                    popup_window.close()
                     pass
             else:
-                sg.popup_error("Please select a todo item to edit.")
+                sg.popup("Please select a todo item to edit.", font=("Helvetica", 12))
 
 
         case "Complete":
-            todo_to_complete = values['todo_items'][0]
-            todos = cfun.get_todos()
-            # Gets a list from values, and grabs the todos.txt file
-            todos.remove(todo_to_complete)
-            cfun.write_todos(todos)
-            #Removes the selected item from the todos_items list, writes the updated list to the file
-            window['todo_items'].update(values=todos)
-            window['todo'].update(value='')
-            #Updates the item list window, and removes the item name from the input box
-
+            try:
+                todo_to_complete = values['todo_items'][0]
+                todos = cfun.get_todos()
+                # Gets a list from values, and grabs the todos.txt file
+                todos.remove(todo_to_complete)
+                cfun.write_todos(todos)
+                #Removes the selected item from the todos_items list, writes the updated list to the file
+                window['todo_items'].update(values=todos)
+                window['todo'].update(value='')
+                #Updates the item list window, and removes the item name from the input box
+            except IndexError:
+                sg.popup("Please select a todo item to complete.", font=("Helvetica", 12))
         case "Exit":
             break
         case "todo_items":
