@@ -2,7 +2,12 @@ import cfun
 import PySimpleGUI as sg                  #imports custom GUI modual. 3rd party library
 from typing import Any
 import time
+import os
 
+if not os.path.exists("todos.txt"):
+    with open("todos.txt", "w") as file:
+        pass
+#Checks for todos file, if not present, file is created
 
 sg.theme("Topanga")
 
@@ -28,6 +33,7 @@ window = sg.Window('To-Do App',
 while True:
 #Keeps the window open
     event, values = window.read(timeout=600)
+    #Timeout is for the clock refresh
     window["clock"].update(value=time.strftime("%b %d, %Y"))
     #Multiple variables can be used with tuples. window.read outputs a dictonary.
     # #Event=Interface button, values=dictonary
